@@ -20,6 +20,8 @@ from langgraph.prebuilt import ToolExecutor, ToolInvocation
 
 
 dotenv.load_dotenv()
+OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
+OPENAI_GPT_MODEL = os.getenv("OPENAI_GPT_MODEL")
 
 # os.environ["LANGCHAIN_TRACING_V2"] = "true"
 # os.environ["LANGCHAIN_API_KEY"] = os.getenv("LANGCHAIN_API_KEY")
@@ -227,8 +229,11 @@ def agent(state: AgentState) -> AgentState:
         ]
     )
     messages = state["messages"]
-    model = ChatOpenAI(temperature=0, streaming=True,
-                       model="gpt-4o-mini")
+    model = ChatOpenAI(
+        api_key=OPENAI_API_KEY,  
+        model_name = OPENAI_GPT_MODEL, 
+        temperature = 0, 
+        streaming = True)
     functions = [format_tool_to_openai_function(t) for t in tools]
     model = model.bind_functions(functions)
     chain = prompt | model
@@ -293,8 +298,11 @@ def generate(state: AgentState) -> AgentState:
     docs = last_message.content
 
     prompt = initialize_prompt_template()
-    llm = ChatOpenAI(model_name="gpt-4o-mini",
-                     temperature=0, streaming=True)
+    llm = ChatOpenAI(
+        api_key=OPENAI_API_KEY, 
+        model_name = OPENAI_GPT_MODEL, 
+        temperature = 0, 
+        streaming = True)
 
     def format_docs(docs):
         return "\n\n".join(doc.page_content for doc in docs)
